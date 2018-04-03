@@ -50,8 +50,10 @@ int main(void) {
 	
 	using namespace std::this_thread; // sleep_for, sleep_until
     using namespace std::chrono;
+    // el 7,8,12, 16(1/3) falso negativo
+    // el 11 falso positivo
 
-	capVideo.open("prueba9.mp4");
+	capVideo.open("prueba17.mp4");
 
 	if (!capVideo.isOpened()) {                                                 // if unable to open video file
 		std::cout << "error reading video file" << std::endl << std::endl;      // show error message
