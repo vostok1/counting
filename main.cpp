@@ -51,7 +51,7 @@ int main(void) {
 	using namespace std::this_thread; // sleep_for, sleep_until
     using namespace std::chrono;
 
-	capVideo.open("pruebaq.mp4");
+	capVideo.open("prueba9.mp4");
 
 	if (!capVideo.isOpened()) {                                                 // if unable to open video file
 		std::cout << "error reading video file" << std::endl << std::endl;      // show error message
@@ -68,7 +68,7 @@ int main(void) {
 	capVideo.read(imgFrame1);
 	capVideo.read(imgFrame2);
 
-	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.75);
+	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.66);
 
 	crossingLine[0].x = 0;
 	crossingLine[0].y = intHorizontalLinePosition;
@@ -85,8 +85,8 @@ int main(void) {
 	while (capVideo.isOpened() && chCheckForEscKey != 27) {
 
 		std::vector<Blob> currentFrameBlobs;
-		//sleep_for(nanoseconds(1));
-    	//sleep_until(system_clock::now() + microseconds(50));
+		sleep_for(nanoseconds(1));
+    	sleep_until(system_clock::now() + microseconds(5));
 		cv::Mat imgFrame1Copy = imgFrame1.clone();
 		cv::Mat imgFrame2Copy = imgFrame2.clone();
 
@@ -135,13 +135,14 @@ int main(void) {
 		for (auto &convexHull : convexHulls) {
 			Blob possibleBlob(convexHull);
 
-			if (possibleBlob.currentBoundingRect.area() > 4000 &&
-				possibleBlob.currentBoundingRect.area() < 18000 &&
+			if (possibleBlob.currentBoundingRect.area() > 3500 &&
+				possibleBlob.currentBoundingRect.area() < 20000 &&
 				possibleBlob.dblCurrentAspectRatio > 0.2 &&
 				possibleBlob.dblCurrentAspectRatio < 6.0 &&
-				possibleBlob.currentBoundingRect.width > 30 &&
+				possibleBlob.currentBoundingRect.width > 40 &&
 				possibleBlob.currentBoundingRect.width < 160 &&
-				possibleBlob.currentBoundingRect.height > 30 &&
+				possibleBlob.currentBoundingRect.height > 60 &&
+				possibleBlob.currentBoundingRect.height < 180 &&
 				possibleBlob.dblCurrentDiagonalSize > 60.0 &&
 				(cv::contourArea(possibleBlob.currentContour) / (double)possibleBlob.currentBoundingRect.area()) > 0.50) {
 				currentFrameBlobs.push_back(possibleBlob);
@@ -164,6 +165,7 @@ int main(void) {
 		imgFrame2Copy = imgFrame2.clone();          // get another copy of frame 2 since we changed the previous frame 2 copy in the processing above
 
 		drawBlobInfoOnImage(blobs, imgFrame2Copy);
+		
 
 		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine(blobs, intHorizontalLinePosition, carCount);
 
@@ -330,12 +332,13 @@ bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs, int &intHorizontalLine
 			std::cout << "\n"; 
 			
 			steps++;	//evitamos los multiples cuentas
-		
+			//std::cout << blob.currentBoundingRect.area() << " ";
+			//std::cout << blob.currentBoundingRect.height << " ";
 			
 			//(blob.centerPositions[prevFrameIndex].y >= intHorizontalLinePosition && blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition)
 			if((pastC != blob.centerPositions[prevFrameIndex].y) && (presentC != blob.centerPositions[currFrameIndex].y)){
-				if ((std::abs (intHorizontalLinePosition - blob.centerPositions[prevFrameIndex].y)  <= 8) && (std::abs(blob.centerPositions[currFrameIndex].y - intHorizontalLinePosition) <= 8))  {
-					if(steps > 5){
+				if ((std::abs (intHorizontalLinePosition - blob.centerPositions[prevFrameIndex].y)  <= 10) && (std::abs(blob.centerPositions[currFrameIndex].y - intHorizontalLinePosition) <= 10))  {
+					if(steps > 10){
 						//cursteps = true;	
 						carCount++;
 						std::cout << carCount;
