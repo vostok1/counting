@@ -53,7 +53,7 @@ int main(void) {
     // el 7,8,12, 16(1/3) falso negativo
     // el 11 falso positivo
 
-	capVideo.open("prueba17.mp4");
+	capVideo.open("redorchestra.mp4");
 
 	if (!capVideo.isOpened()) {                                                 // if unable to open video file
 		std::cout << "error reading video file" << std::endl << std::endl;      // show error message
