@@ -2,7 +2,7 @@
 
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>
-#include<opencv2/imgproc/imgproc.hpp>
+//#include<opencv2/imgproc/imgproc.hpp>
 #include <stdio.h> 
 #include "opencv2/video.hpp"
 #include<iostream>
@@ -95,8 +95,10 @@ int main(void) {
 		cv::Mat imgDifference;
 		cv::Mat imgThresh;
 
+		//cambiamos a ecala de grises
 		cv::cvtColor(imgFrame1Copy, imgFrame1Copy, CV_BGR2GRAY);
 		cv::cvtColor(imgFrame2Copy, imgFrame2Copy, CV_BGR2GRAY);
+		
 		//Aplicamos filtro gaussiano
 
 		cv::GaussianBlur(imgFrame1Copy, imgFrame1Copy, cv::Size(5, 5), 0);
@@ -113,12 +115,14 @@ int main(void) {
 
 
 		cv::imshow("imgThresh", imgThresh);
-
+		//
 		cv::Mat structuringElement3x3 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
 		cv::Mat structuringElement5x5 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
 		cv::Mat structuringElement7x7 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7, 7));
 		cv::Mat structuringElement15x15 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15));
 
+
+		//aplicamos hernels para engrosar y adelgazar elementos
 		for (unsigned int i = 0; i < 2; i++) {
 			cv::dilate(imgThresh, imgThresh, structuringElement5x5);
 			cv::dilate(imgThresh, imgThresh, structuringElement5x5);
@@ -129,18 +133,24 @@ int main(void) {
 
 		std::vector<std::vector<cv::Point> > contours;
 
+
+		//Buscamos bordes
 		cv::findContours(imgThreshCopy, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
 		drawAndShowContours(imgThresh.size(), contours, "imgContours");
 
 		std::vector<std::vector<cv::Point> > convexHulls(contours.size());
 
+
+		//Se crean poligonos regulares de los contornos
 		for (unsigned int i = 0; i < contours.size(); i++) {
 			cv::convexHull(contours[i], convexHulls[i]);
 		}
 
 		drawAndShowContours(imgThresh.size(), convexHulls, "imgConvexHulls");
 
+
+		//Se establecen los requisitos de los blobs
 		for (auto &convexHull : convexHulls) {
 			Blob possibleBlob(convexHull);
 
@@ -158,6 +168,7 @@ int main(void) {
 			}
 		}
 
+		//se generan los rectangulos que encerran a  los blobs
 		drawAndShowContours(imgThresh.size(), currentFrameBlobs, "imgCurrentFrameBlobs");
 
 		if (blnFirstFrame == true) {
@@ -176,6 +187,8 @@ int main(void) {
 		drawBlobInfoOnImage(blobs, imgFrame2Copy);
 		
 
+		//Se revisa si algun blob cruzo la linea
+
 		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine(blobs, intHorizontalLinePosition, carCount);
 
 		if (blnAtLeastOneBlobCrossedTheLine == true) {
@@ -191,7 +204,7 @@ int main(void) {
 
 		//cv::waitKey(0);                 // uncomment this line to go frame by frame for debugging
 
-		// now we prepare for the next iteration
+		// se vacia el buffer
 
 		currentFrameBlobs.clear();
 
@@ -399,5 +412,4 @@ void drawCarCountOnImage(int &carCount, cv::Mat &imgFrame2Copy) {
 	cv::putText(imgFrame2Copy, std::to_string(carCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
 
 }
-
 
