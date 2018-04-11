@@ -97,13 +97,20 @@ int main(void) {
 
 		cv::cvtColor(imgFrame1Copy, imgFrame1Copy, CV_BGR2GRAY);
 		cv::cvtColor(imgFrame2Copy, imgFrame2Copy, CV_BGR2GRAY);
+		//Aplicamos filtro gaussiano
 
 		cv::GaussianBlur(imgFrame1Copy, imgFrame1Copy, cv::Size(5, 5), 0);
 		cv::GaussianBlur(imgFrame2Copy, imgFrame2Copy, cv::Size(5, 5), 0);
-
+		
+		//Restamos las imagenes
 		cv::absdiff(imgFrame1Copy, imgFrame2Copy, imgDifference);
 
+		//Binarizamos la imagen
 		cv::threshold(imgDifference, imgThresh, 30, 255.0, CV_THRESH_BINARY);
+
+		//
+
+
 
 		cv::imshow("imgThresh", imgThresh);
 
@@ -300,7 +307,7 @@ void drawAndShowContours(cv::Size imageSize, std::vector<std::vector<cv::Point> 
 
 	cv::drawContours(image, contours, -1, SCALAR_WHITE, -1);
 
-	cv::imshow(strImageName, image);
+	//cv::imshow(strImageName, image);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -318,7 +325,7 @@ void drawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs, std::strin
 
 	cv::drawContours(image, contours, -1, SCALAR_WHITE, -1);
 
-	cv::imshow(strImageName, image);
+	//cv::imshow(strImageName, image);
 }
 
 
@@ -343,7 +350,7 @@ bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs, int &intHorizontalLine
 					if(steps > 10){
 						//cursteps = true;	
 						carCount++;
-						std::cout << carCount;
+						std::cout << "carro:" << carCount << " " ;
 						blnAtLeastOneBlobCrossedTheLine = true;
 						presentC = blob.centerPositions[currFrameIndex].y;
 						pastC = blob.centerPositions[prevFrameIndex].y;
@@ -392,4 +399,5 @@ void drawCarCountOnImage(int &carCount, cv::Mat &imgFrame2Copy) {
 	cv::putText(imgFrame2Copy, std::to_string(carCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
 
 }
+
 
